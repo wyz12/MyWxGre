@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="zxwl.com.mywxgre.activity.Main5Activity">
+    <android.support.v7.widget.Toolbar
+        android:background="#df0000"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+        <TextView
+            android:textStyle="bold"
+            android:textSize="21dp"
+            android:text="设置"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </android.support.v7.widget.Toolbar>
+
+    <Button
+        android:id="@+id/xgpass"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="修改密码" />
+
+    <Button
+        android:id="@+id/gx"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="版本更新检测" />
+
+    <Button
+        android:id="@+id/yjfk"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="意见反馈" />
+    <Button
+        android:id="@+id/tc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="退出登录" />
+
+    <Button
+        android:id="@+id/gywm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="关于我们" />
+</LinearLayout>
