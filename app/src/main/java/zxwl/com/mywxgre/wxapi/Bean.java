@@ -1,4 +1,4 @@
-package zxwl.com.mywxgre;
+package zxwl.com.mywxgre.wxapi;
 
 import java.util.List;
 
@@ -39,6 +39,11 @@ public class Bean {
 
     private boolean modify_result;
     private List<DatasBean> datas;
+    /**
+     * id : 1
+     */
+
+    private String id;
 
     public boolean isLogin_result() {
         return login_result;
@@ -99,6 +104,14 @@ public class Bean {
         this.datas = datas;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
 
     public static class DatasBean {
         /**
@@ -133,4 +146,7 @@ public class Bean {
             this.img = img;
         }
     }
+
+
+
 }

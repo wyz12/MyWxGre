@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="150dp">
+        <ScrollView
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:padding="10dp"
+                android:id="@+id/sharecode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minLines="2"
+                android:text="nihay\nsdas"
+                android:textSize="20dp" />
+        </ScrollView>
+        <LinearLayout
+            android:layout_weight="2.8"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <Button
+                android:layout_weight="1"
+                android:background="#550ff000"
+                android:text="复制"
+                android:id="@+id/copybutton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/share"
+                android:background="#55ff0000"
+                android:text="直接分享"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
+
+    </LinearLayout>
+    <TextView
+        android:id="@+id/name"
+        android:gravity="center"
+        android:textSize="21dp"
+        android:textStyle="bold"
+        android:text="近期活动"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+        <ListView
+            android:id="@+id/ls"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </ListView>
+
+
+
+
+</LinearLayout>

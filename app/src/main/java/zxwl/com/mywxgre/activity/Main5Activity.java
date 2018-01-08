@@ -1,8 +1,12 @@
 package zxwl.com.mywxgre.activity;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -21,11 +25,11 @@ import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import zxwl.com.mywxgre.Bean;
 import zxwl.com.mywxgre.R;
 import zxwl.com.mywxgre.Utilis;
 import zxwl.com.mywxgre.service.Server;
 import zxwl.com.mywxgre.utils.MD5Jm;
+import zxwl.com.mywxgre.wxapi.Bean;
 
 public class Main5Activity extends AppCompatActivity implements View.OnClickListener {
 
@@ -53,6 +57,10 @@ public class Main5Activity extends AppCompatActivity implements View.OnClickList
      * 关于我们
      */
     private Button mGywm;
+    /**
+     * 联系客服
+     */
+    private Button mKf;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +82,8 @@ public class Main5Activity extends AppCompatActivity implements View.OnClickList
         mXgpass.setOnClickListener(this);
         mGywm = (Button) findViewById(R.id.gywm);
         mGywm.setOnClickListener(this);
+        mKf = (Button) findViewById(R.id.kf);
+        mKf.setOnClickListener(this);
     }
 
     @Override
@@ -111,12 +121,21 @@ public class Main5Activity extends AppCompatActivity implements View.OnClickList
                 break;
             case R.id.gywm:
                 AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
-                builder1.setIcon(R.drawable.caishen1);
+                builder1.setIcon(R.drawable.logo);
                 builder1.setTitle("告示");
                 builder1.setMessage("本应用由昭兴网络科技公司开发,\n切勿用到违背国家道德法律的地方" +
                         "\n争做遵纪守法好公民，共创美好未来 \n\n如有意见！！！\n感谢各位在意见反馈中提出你的宝贵见解\n \n            小昭在这里祝大家2018新年快乐");
-                builder1.setNegativeButton("确定",null);
+                builder1.setNegativeButton("确定", null);
                 builder1.show();
+                break;
+            case R.id.kf:
+                if (checkApkExist(this, "com.tencent.mobileqq")) {
+
+                    String qqUrl = "mqqwpa://im/chat?chat_type=wpa&uin=1561230358&version=1";
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(qqUrl)));
+                } else {
+                    Toast.makeText(this, "本机未安装QQ应用", Toast.LENGTH_SHORT).show();
+                }
                 break;
         }
     }
@@ -149,7 +168,7 @@ public class Main5Activity extends AppCompatActivity implements View.OnClickList
 
         AlertDialog.Builder normalDialog =
                 new AlertDialog.Builder(Main5Activity.this);
-        normalDialog.setIcon(R.drawable.caishen1);
+        normalDialog.setIcon(R.drawable.logo);
         normalDialog.setTitle("意见箱");
         normalDialog.setMessage("感谢你宝贵的意见");
         editText = new EditText(this);
@@ -263,7 +282,7 @@ public class Main5Activity extends AppCompatActivity implements View.OnClickList
 
         AlertDialog.Builder normalDialog =
                 new AlertDialog.Builder(Main5Activity.this);
-        normalDialog.setIcon(R.drawable.caishen1);
+        normalDialog.setIcon(R.drawable.logo);
         normalDialog.setTitle("修改密码");
         ;
         View inflate = LayoutInflater.from(this).inflate(R.layout.layout_ls, null);
@@ -335,5 +354,15 @@ public class Main5Activity extends AppCompatActivity implements View.OnClickList
 
 
     }
-
+    public boolean checkApkExist(Context context, String packageName) {
+        if (packageName == null || "".equals(packageName))
+            return false;
+        try {
+            ApplicationInfo info = context.getPackageManager().getApplicationInfo(packageName,
+                    PackageManager.GET_UNINSTALLED_PACKAGES);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
+    }
 }

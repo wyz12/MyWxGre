@@ -67,7 +67,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal" />
-
+        <TextView
+            android:textSize="21dp"
+            android:gravity="center"
+            android:text="使用时请更新到微信6.6.1版本\n请打开微信消息通知\n关闭手机锁屏密码"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
     </LinearLayout>
+
+
 
 </LinearLayout>

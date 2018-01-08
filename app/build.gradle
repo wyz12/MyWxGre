@@ -16,6 +16,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+        }
+    }
+
 }
 
 dependencies {
@@ -30,4 +39,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.8.1'
     compile 'com.github.bumptech.glide:glide:4.0.0'
     implementation files('libs/MobCommons-2017.1213.1552.jar')
+    compile 'com.android.support:design:26.+'
+    implementation files('libs/open_sdk_r5788_lite.jar')
+    implementation files('libs/SocialSDK_QQ_Full.jar')
 }

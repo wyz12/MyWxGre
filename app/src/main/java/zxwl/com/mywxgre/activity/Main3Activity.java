@@ -3,6 +3,7 @@ package zxwl.com.mywxgre.activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,6 +12,9 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import cn.smssdk.EventHandler;
 import cn.smssdk.SMSSDK;
@@ -19,7 +23,7 @@ import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import zxwl.com.mywxgre.Bean;
+import zxwl.com.mywxgre.wxapi.Bean;
 import zxwl.com.mywxgre.R;
 import zxwl.com.mywxgre.Utilis;
 import zxwl.com.mywxgre.utils.MD5Jm;
@@ -47,18 +51,19 @@ public class Main3Activity extends AppCompatActivity implements View.OnClickList
      * 获取验证码
      */
     private Button mHyyz;
-    private int i=60;
-    private boolean flag;
+    private int i = 60;
+
     private Handler hann = new Handler();
     private Runnable runn = new Runnable() {
         @Override
         public void run() {
-            if(i>0){
+
+            if (i > 0) {
                 i--;
-                mHyyz.setText("("+i+")秒");
+                mHyyz.setText("(" + i + ")秒");
                 mHyyz.setEnabled(false);
-                hann.postDelayed(runn,1000);
-            }else{
+                hann.postDelayed(runn, 1000);
+            } else {
                 mHyyz.setText("重新获取");
                 mHyyz.setEnabled(true);
             }
@@ -67,12 +72,21 @@ public class Main3Activity extends AppCompatActivity implements View.OnClickList
     };
     private int eventSubmitVerificationCode;
     private int resultComplete;
+    /**
+     * 请输入邀请码(没有可以忽略)
+     */
+    private EditText mHyid;
+    private String format;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main3);
         initView();
+
+
+
+
 
 
     }
@@ -85,6 +99,7 @@ public class Main3Activity extends AppCompatActivity implements View.OnClickList
         mYzm = (EditText) findViewById(R.id.yzm);
         mHyyz = (Button) findViewById(R.id.hyyz);
         mHyyz.setOnClickListener(this);
+        mHyid = (EditText) findViewById(R.id.hyid);
     }
 
     @Override
@@ -105,15 +120,14 @@ public class Main3Activity extends AppCompatActivity implements View.OnClickList
                     return;
                 }
 
-                if(mYzm.length()==6){
-                    submitCode("86",  mPhone.getText().toString(), mYzm.getText().toString());
-                }else{
+                if (mYzm.length() == 6) {
+                    submitCode("86", mPhone.getText().toString(), mYzm.getText().toString());
+            
+
+                } else {
                     Toast.makeText(this, "请输入六位验证码", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
-
-
 
 
                 break;
@@ -123,18 +137,162 @@ public class Main3Activity extends AppCompatActivity implements View.OnClickList
                     SMSSDK.getVerificationCode("86", mPhone.getText().toString()); // 发送验证码给号码的 phoneNumber 的手机
                     Toast.makeText(this, "获取验证码成功", Toast.LENGTH_SHORT).show();
                     mYzm.requestFocus();
-                }else{
+                } else {
                     Toast.makeText(this, "请输入正确的手机号", Toast.LENGTH_SHORT).show();
                 }
-                hann.postDelayed(runn,1000);
+                hann.postDelayed(runn, 1000);
                 break;
         }
     }
 
     private void zc() {
         String md5 = MD5Jm.getMD5(mPass.getText().toString());
-
         RequestBody body = new FormBody.Builder().add("action", "register").add("phone", mPhone.getText().toString()).add("pass", md5).build();
+        Utilis.getInstance().sendPost("http://www.zxwlwh.com/Wx/WxGre.php", body, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                final String string = response.body().string();
+                    Log.e("AAA",string);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Gson gson = new Gson();
+                        Bean bean = gson.fromJson(string, Bean.class);
+                        if (bean.isRegister_result()) {
+                            if(!mHyid.getText().toString().equals("")){
+                                cx();
+                            }else{
+                                Toast.makeText(Main3Activity.this, "恭喜你注册成功", Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
+
+                        } else {
+
+                            Toast.makeText(Main3Activity.this, "注册失败", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+
+            }
+        });
+    }
+
+
+
+
+
+    public void submitCode(String country, String phone, String code) {
+        // 注册一个事件回调，用于处理提交验证码操作的结果
+        SMSSDK.registerEventHandler(new EventHandler() {
+            public void afterEvent(int event, int result, Object data) {
+                if (result == SMSSDK.RESULT_COMPLETE) {
+                    // TODO 处理验证成功的结果
+                    zc();
+
+
+                } else {
+                    // TODO 处理错误的结果
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(Main3Activity.this, "验证码错误", Toast.LENGTH_SHORT).show();
+
+                        }
+                    });
+
+
+                }
+
+                // 用完回调要注销，否则会造成泄露
+                SMSSDK.unregisterEventHandler(this);
+            }
+        });
+        // 触发操作
+        SMSSDK.submitVerificationCode(country, phone, code);
+    }
+
+
+
+
+
+
+
+
+
+
+
+    private void cr() {
+
+        RequestBody body = new FormBody.Builder().add("action", "idmodifyvip").add("id", mHyid.getText().toString()).add("vip", format).build();
+        Utilis.getInstance().sendPost("http://www.zxwlwh.com/Wx/WxGre.php", body, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                final String string = response.body().string();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Gson gson = new Gson();
+                        Bean bean = gson.fromJson(string, Bean.class);
+                        if (bean.isModify_result()) {
+                            crx();
+
+                        } else {
+                            crx();
+                            Toast.makeText(Main3Activity.this, "推广奖励获取失败", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+            }
+        });
+    }
+
+    private void crx() {
+
+        RequestBody body = new FormBody.Builder().add("action", "tgtj").add("phone", mHyid.getText().toString()).add("bphone", mPhone.getText().toString()).build();
+        Utilis.getInstance().sendPost("http://www.zxwlwh.com/Wx/WxGre.php", body, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                final String string = response.body().string();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Gson gson = new Gson();
+                        Bean bean = gson.fromJson(string, Bean.class);
+
+                        if (bean.isModify_result()) {
+                            Toast.makeText(Main3Activity.this, "恭喜你注册成功", Toast.LENGTH_SHORT).show();
+                            finish();
+
+                        } else {
+                            Toast.makeText(Main3Activity.this, "注册失败", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        });
+    }
+    private void cx() {
+        Log.e("ttt1",mHyid.getText().toString());
+        RequestBody body = new FormBody.Builder().add("action", "idhqvip").add("id", mHyid.getText().toString()).build();
         Utilis.getInstance().sendPost("http://www.zxwlwh.com/Wx/WxGre.php", body, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -147,16 +305,29 @@ public class Main3Activity extends AppCompatActivity implements View.OnClickList
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Gson gson = new Gson();
-                        Bean bean = gson.fromJson(string, Bean.class);
-                        if (bean.isRegister_result()) {
+                        if(string.equals("")){
                             Toast.makeText(Main3Activity.this, "恭喜你注册成功", Toast.LENGTH_SHORT).show();
                             finish();
-                        } else {
-                            Toast.makeText(Main3Activity.this, "注册失败", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        Gson gson = new Gson();
+                        Bean bean = gson.fromJson(string, Bean.class);
+                        String vip = bean.getVip();
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        try {
+                            long vv = sdf.parse(vip).getTime();
+                            long nn= vv+259200000;
+                            String format1 = sdf.format(new Date(vv));
+                            format = sdf.format(new Date(nn));
+                            cr();
+                        } catch (ParseException e) {
+                            e.printStackTrace();
                         }
                     }
                 });
+
+
 
 
             }
@@ -164,27 +335,4 @@ public class Main3Activity extends AppCompatActivity implements View.OnClickList
     }
 
 
-    public void submitCode(String country, String phone, String code) {
-        // 注册一个事件回调，用于处理提交验证码操作的结果
-        SMSSDK.registerEventHandler(new EventHandler() {
-                                        public void afterEvent(int event, int result, Object data) {
-                                            if (result == SMSSDK.RESULT_COMPLETE) {
-                                                // TODO 处理验证成功的结果
-                                                zc();
-
-                                            } else{
-                                                // TODO 处理错误的结果
-                                                Toast.makeText(Main3Activity.this, "验证码错误", Toast.LENGTH_SHORT).show();
-
-
-
-                                            }
-
-                                            // 用完回调要注销，否则会造成泄露
-                                            SMSSDK.unregisterEventHandler(this);
-                                        }
-                                    });
-                // 触发操作
-                SMSSDK.submitVerificationCode(country, phone, code);
-    }
 }

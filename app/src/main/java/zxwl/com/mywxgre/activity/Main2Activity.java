@@ -20,10 +20,10 @@ import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import zxwl.com.mywxgre.Bean;
 import zxwl.com.mywxgre.R;
 import zxwl.com.mywxgre.Utilis;
 import zxwl.com.mywxgre.utils.MD5Jm;
+import zxwl.com.mywxgre.wxapi.Bean;
 
 public class Main2Activity extends AppCompatActivity implements View.OnClickListener {
 
@@ -77,8 +77,8 @@ public class Main2Activity extends AppCompatActivity implements View.OnClickList
                 break;
             case R.id.login:
                 String md5 = MD5Jm.getMD5(mPass.getText().toString());
-                RequestBody body = new FormBody.Builder().add("action","login").add("phone",mPhone.getText().toString()).add("pass",md5).build();
-                Utilis.getInstance().sendPost("http://www.zxwlwh.com/Wx/WxGre.php", body, new Callback() {
+                RequestBody body1 = new FormBody.Builder().add("action","login").add("phone",mPhone.getText().toString()).add("pass",md5).build();
+                Utilis.getInstance().sendPost("http://www.zxwlwh.com/Wx/WxGre.php", body1, new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
 
@@ -87,10 +87,13 @@ public class Main2Activity extends AppCompatActivity implements View.OnClickList
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
                         final String string = response.body().string();
-
+                        Log.e("TTT",string);
+                        Log.e("TTT",mPass.getText().toString());
+                        Log.e("TTT",mPhone.getText().toString());
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+
                                 Gson gson = new Gson();
                                 Bean bean = gson.fromJson(string, Bean.class);
                                 if(bean.isLogin_result()){
@@ -98,6 +101,8 @@ public class Main2Activity extends AppCompatActivity implements View.OnClickList
                                 }else{
                                     Toast.makeText(Main2Activity.this, "密码错误", Toast.LENGTH_SHORT).show();
                                 }
+
+
                             }
                         });
 
@@ -133,7 +138,7 @@ public class Main2Activity extends AppCompatActivity implements View.OnClickList
                             SharedPreferences.Editor editor = sp.edit();
                             editor.putString("phone", mPhone.getText().toString());
                             editor.commit();
-                        Log.e("TTT",bean.getLogin());
+                             Log.e("TTT",bean.getLogin());
                             if(bean.getLogin().equals("0")){
                                 cr(1);
                             }else{

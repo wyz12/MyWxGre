@@ -29,12 +29,12 @@ import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import zxwl.com.mywxgre.Bean;
 import zxwl.com.mywxgre.R;
 import zxwl.com.mywxgre.Utilis;
 import zxwl.com.mywxgre.service.Server;
 import zxwl.com.mywxgre.utils.SettingConfig;
 import zxwl.com.mywxgre.utils.TimeUtlis;
+import zxwl.com.mywxgre.wxapi.Bean;
 
 public class Main4Activity extends AppCompatActivity implements View.OnClickListener {
 
@@ -99,7 +99,7 @@ public class Main4Activity extends AppCompatActivity implements View.OnClickList
         mPhone.setText("用户名\n" + phone);
 //        检测会员是否到期
         cx();
-        //        检测应用是否需要更新
+//        //        检测应用是否需要更新
         gxjc();
         cxx();
         han.postDelayed(runn, 2000000);
@@ -137,10 +137,28 @@ public class Main4Activity extends AppCompatActivity implements View.OnClickList
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                try {
                 String string = response.body().string();
                 Gson gson = new Gson();
                 Bean bean = gson.fromJson(string, Bean.class);
-                vip = bean.getVip();
+                    vip = bean.getVip();
+                }catch(NullPointerException vip) {
+                    SharedPreferences sp = getSharedPreferences("SP", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sp.edit();
+                    editor.clear();
+                    editor.commit();
+                    startActivity(new Intent(Main4Activity.this,Main2Activity.class));
+                    finish();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(Main4Activity.this, "账号异123常请重新登录", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+
+
                 hq();
 
 
@@ -149,22 +167,7 @@ public class Main4Activity extends AppCompatActivity implements View.OnClickList
     }
 
 
-//    private void cr(String ss) {
-//
-//        RequestBody body = new FormBody.Builder().add("action", "modifyvip").add("phone", phone).add("vip", ss).build();
-//        Utilis.getInstance().sendPost("http://www.zxwlwh.com/Wx/WxGre.php", body, new Callback() {
-//            @Override
-//            public void onFailure(Call call, IOException e) {
-//
-//
-//            }
-//
-//            @Override
-//            public void onResponse(Call call, Response response) throws IOException {
-//
-//            }
-//        });
-//    }
+
 
     private void hq() {
         RequestBody body = new FormBody.Builder().add("action", "severtime").build();
@@ -185,13 +188,21 @@ public class Main4Activity extends AppCompatActivity implements View.OnClickList
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-
+                        if ("VIP".equals(vip)) {
+                            mViptime.setText("永久VIP");
+                            mQhb.setEnabled(true);
+                            TimeUtlis.setPd(true);
+                            return;
+                        }
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                         try {
+
                             long vv = sdf.parse(vip).getTime();
+
                             long tt = sdf.parse(time).getTime();
-                            if (tt > vv) {
-                                mViptime.setText("体验会员到期\n开通永久会员限时4.99元");
+
+                           if (tt > vv) {
+                                mViptime.setText("体验会员到期\n开通永久会员限时9.9元");
                                 mQhb.setEnabled(false);
                                 SettingConfig.getInstance().setReEnable(false);
                                 mQhb.setText("抢红包\n体验会员到期\n开通永久会员\n或邀请好友得体验");
@@ -202,7 +213,7 @@ public class Main4Activity extends AppCompatActivity implements View.OnClickList
                                         startActivity(new Intent(Main4Activity.this, Main6Activity.class));
                                     }
                                 });
-                            } else {
+                            }else{
                                 mViptime.setText("体验会员到期时间\n" + vip);
                                 mQhb.setEnabled(true);
                                 TimeUtlis.setPd(true);
@@ -236,11 +247,12 @@ public class Main4Activity extends AppCompatActivity implements View.OnClickList
                     public void run() {
                         Gson gson = new Gson();
                         Bean bean = gson.fromJson(string, Bean.class);
+
                         String login1 = bean.getLogin();
+
                         SharedPreferences sp = getSharedPreferences("SP", MODE_PRIVATE);
                         String login = sp.getString("login", "");
                         if (!login.equals("")) {
-                            Log.e("TTT", login1 + "---" + login);
                             if (!login1.equals(login)) {
 
                                 SharedPreferences.Editor editor = sp.edit();
@@ -293,10 +305,14 @@ public class Main4Activity extends AppCompatActivity implements View.OnClickList
                 Toast.makeText(this, "等待下个版本添加", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.kthy:
-                startActivity(new Intent(Main4Activity.this, Main6Activity.class));
+                Intent intent = new Intent(Main4Activity.this, Main6Activity.class);
+                 intent.putExtra("vip",vip);
+                startActivity(intent);
                 break;
             case R.id.yqhy:
-                startActivity(new Intent(Main4Activity.this, Main7Activity.class));
+                Intent intent2 = new Intent(Main4Activity.this, Main7Activity.class);
+                intent2.putExtra("phone", phone);
+                startActivity(intent2);
                 break;
             case R.id.sz:
                 Intent intent1 = new Intent(Main4Activity.this, Main5Activity.class);
@@ -331,7 +347,7 @@ public class Main4Activity extends AppCompatActivity implements View.OnClickList
                         String edition = bean.getDatas().get(0).getEdition();
                         String address = bean.getDatas().get(0).getAddress();
                         String img = bean.getDatas().get(0).getImg();
-
+                        Log.e("TTT",img);
                         Glide.with(Main4Activity.this).load(img).into(mImage);
                         long l = System.currentTimeMillis();
                         SharedPreferences preferences = getSharedPreferences("SP", Context.MODE_PRIVATE);
