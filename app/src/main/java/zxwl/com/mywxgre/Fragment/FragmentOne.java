@@ -18,11 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.umeng.socialize.ShareAction;
-import com.umeng.socialize.UMShareListener;
-import com.umeng.socialize.bean.SHARE_MEDIA;
-import com.umeng.socialize.media.UMImage;
-import com.umeng.socialize.media.UMWeb;
 
 import java.io.IOException;
 import java.util.List;
@@ -177,59 +172,12 @@ public class FragmentOne extends Fragment implements View.OnClickListener {
 
                 break;
             case R.id.share:
-                String url = "http://www.zxwlwh.com/Wxx/?id="+id;
-                UMWeb web = new UMWeb(url);
-                web.setTitle("AITool");
-                UMImage image = new UMImage(getContext(), R.drawable.logo);
-                web.setThumb(image);  //缩略图
-                web.setDescription("自动抢红包,不错过任何一个红包,快来一起体验一下,注册填写邀请人:【" + id + "】免费得会员");
-                new ShareAction(getActivity())
-                        .withMedia(web)
-                        .setDisplayList(SHARE_MEDIA.QQ)
-                        .setCallback(shareListener)
-                        .open();
+
                 break;
         }
     }
 
 
-    private UMShareListener shareListener = new UMShareListener() {
-        /**
-         * @descrption 分享开始的回调
-         * @param platform 平台类型
-         */
-        @Override
-        public void onStart(SHARE_MEDIA platform) {
 
-        }
 
-        /**
-         * @descrption 分享成功的回调
-         * @param platform 平台类型
-         */
-        @Override
-        public void onResult(SHARE_MEDIA platform) {
-            Toast.makeText(getContext(), "成功了", Toast.LENGTH_LONG).show();
-        }
-
-        /**
-         * @descrption 分享失败的回调
-         * @param platform 平台类型
-         * @param t 错误原因
-         */
-        @Override
-        public void onError(SHARE_MEDIA platform, Throwable t) {
-            Toast.makeText(getContext(), "失败" + t.getMessage(), Toast.LENGTH_LONG).show();
-        }
-
-        /**
-         * @descrption 分享取消的回调
-         * @param platform 平台类型
-         */
-        @Override
-        public void onCancel(SHARE_MEDIA platform) {
-            Toast.makeText(getContext(), "取消了", Toast.LENGTH_LONG).show();
-
-        }
-    };
 }

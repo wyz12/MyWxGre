@@ -1,8 +1,11 @@
 package zxwl.com.mywxgre.activity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -14,6 +17,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -27,7 +31,8 @@ import zxwl.com.mywxgre.wxapi.Bean;
 
 public class Main2Activity extends AppCompatActivity implements View.OnClickListener {
 
-
+    private LocationManager locationManager;
+    private String locationProvider;
     /**
      * 账号
      */
@@ -50,6 +55,33 @@ public class Main2Activity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
         initView();
+
+
+
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        //获取所有可用的位置提供器
+        List<String> providers = locationManager.getProviders(true);
+        if(providers.contains(LocationManager.GPS_PROVIDER)){
+            //如果是GPS
+            locationProvider = LocationManager.GPS_PROVIDER;
+        }else if(providers.contains(LocationManager.NETWORK_PROVIDER)){
+            //如果是Network
+            locationProvider = LocationManager.NETWORK_PROVIDER;
+        }else{
+            Toast.makeText(this, "没有可用的位置提供器", Toast.LENGTH_SHORT).show();
+            return ;
+        }
+        //获取Location
+        @SuppressLint("MissingPermission") Location location = locationManager.getLastKnownLocation(locationProvider);
+        if(location!=null){
+            //不为空,显示地理位置经纬度
+            showLocation(location);
+        }
+
+
+
+
+
         SharedPreferences preferences=getSharedPreferences("SP", Context.MODE_PRIVATE);
         String phone = preferences.getString("phone", "");
         if(!phone.equals("")){
@@ -182,5 +214,19 @@ public class Main2Activity extends AppCompatActivity implements View.OnClickList
     }
 
 
+
+
+
+    /**
+     * 显示地理位置经度和纬度信息
+     * @param location
+     */
+    private void showLocation(Location location){
+//        location.getLatitude();
+//        location.getLongitude();
+
+
+
+    }
 
 }
